@@ -2,26 +2,21 @@ export const socials = [
   {
     title: 'Instagram',
     icon: 'mdi:instagram',
-    url: 'https://www.instagram.com/jaydanurwin/',
+    url: 'https://www.instagram.com/peerpen_app/',
   },
   {
-    title: 'Twitter',
-    icon: 'mdi:twitter',
-    url: 'https://twitter.com/littlesticksdev',
+    title: 'LinkedIn',
+    icon: 'mdi:linkedin',
+    url: 'https://www.linkedin.com/company/peer-pen',
   },
   {
     title: 'YouTube',
     icon: 'mdi:youtube',
-    url: 'https://youtube.com/c/LittleSticks',
+    url: 'https://www.youtube.com/channel/UC8xJpMIxRzZS0Qic06W9bhg',
   },
   {
     title: 'GitHub',
     icon: 'mdi:github',
-    url: 'https://github.com/littlesticksdev',
-  },
-  {
-    title: 'Dribbble',
-    icon: 'mdi:dribbble',
-    url: 'https://dribbble.com/littlesticksdev',  
+    url: 'https://github.com/PeerPenApp/PeerPenWebsite',
   }
 ]

@@ -1,6 +1,6 @@
 export const settings = {
-  site: 'https://cannonball.littlesticks.dev',
-  name: 'Little Sticks',
-  title: 'Cannonball by Little Sticks | A splash page template',
-  description: 'This is a simple splash page template built with Astro by Little Sticks',
+  site: 'https://peerpen.xyz',
+  name: 'PeerPen',
+  title: 'Peer Pen | The social feedback platform for college essays',
+  description: 'This is a social feedback platform for college essays. Built by students, for students.',
 }
