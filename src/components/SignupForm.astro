@@ -1,0 +1,220 @@
+---
+import Button from "./Button.astro";
+
+// Get the API key from environment variables
+const buttondownApiKey = import.meta.env.BUTTONDOWN_API_KEY;
+
+// Debug: Check if environment variable is loaded
+console.log('Server-side: API key loaded:', !!buttondownApiKey);
+console.log('Server-side: API key length:', buttondownApiKey?.length);
+---
+
+<style>
+  .signup__form {
+    margin: 2rem 0;
+    width: 100%;
+    display: flex;
+    max-width: 600px;
+  }
+
+  input[type='text'],
+  input[type='email'],
+  input[type='date'],
+  input[type='tel'] {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    border: 2px solid #ccc;
+    color: #000000;
+    border-radius: 2rem;
+    outline-style: none;
+  }
+
+  input:focus {
+    border: 2px solid var(--mint);
+    box-shadow: 0 0 0 3px rgba(192, 253, 251, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .signup__form :global(.btn) {
+    margin-left: 1rem;
+  }
+
+  .form-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    z-index: 1000;
+    transform: translateX(400px);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    max-width: 300px;
+  }
+
+  .form-message.show {
+    transform: translateX(0);
+  }
+
+  .form-message.success {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.95), rgba(34, 197, 94, 0.9));
+    color: white;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+  }
+
+  .form-message.error {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(239, 68, 68, 0.9));
+    color: white;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+  }
+
+  .form-message::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    border-radius: 0.75rem 0 0 0.75rem;
+  }
+
+  .form-message.success::before {
+    background: linear-gradient(to bottom, #22c55e, #16a34a);
+  }
+
+  .form-message.error::before {
+    background: linear-gradient(to bottom, #ef4444, #dc2626);
+  }
+
+  .loading {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+</style>
+
+<form class="signup__form fade-in hover-lift" id="buttondown-form">
+  <input type="email" name="email" placeholder="Your email" required class="glow focus-mint" id="email-input"/>
+  <Button type="submit" id="submit-btn">Join the Waitlist</Button>
+</form>
+
+<div id="form-message" class="form-message" style="display: none;"></div>
+
+<script define:vars={{ buttondownApiKey }}>
+  console.log('Script loaded!');
+  console.log('API Key available:', !!buttondownApiKey);
+  
+  const form = document.getElementById('buttondown-form');
+  const emailInput = document.getElementById('email-input');
+  const submitBtn = document.getElementById('submit-btn');
+  const messageDiv = document.getElementById('form-message');
+  
+  console.log('Form element:', form);
+  console.log('Email input:', emailInput);
+  console.log('Submit button:', submitBtn);
+  console.log('Message div:', messageDiv);
+
+  function showMessage(message, type) {
+    console.log('Showing message:', message, type);
+    messageDiv.textContent = message;
+    messageDiv.className = `form-message ${type}`;
+    messageDiv.style.display = 'block';
+    
+    // Trigger the slide-in animation
+    setTimeout(() => {
+      messageDiv.classList.add('show');
+      console.log('Added show class');
+    }, 10);
+    
+    // Hide message after 4 seconds
+    setTimeout(() => {
+      messageDiv.classList.remove('show');
+      setTimeout(() => {
+        messageDiv.style.display = 'none';
+      }, 300);
+    }, 4000);
+  }
+
+  function setLoading(loading) {
+    console.log('Setting loading:', loading);
+    if (loading) {
+      form.classList.add('loading');
+      submitBtn.textContent = 'Joining...';
+      console.log('Form is now loading');
+    } else {
+      form.classList.remove('loading');
+      submitBtn.textContent = 'Join the Waitlist';
+      console.log('Form loading finished');
+    }
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    console.log('Form submitted!');
+    
+    const email = emailInput.value.trim();
+    console.log('Email:', email);
+    
+    if (!email) {
+      console.log('No email provided');
+      showMessage('Please enter a valid email address.', 'error');
+      return;
+    }
+
+    console.log('Setting loading state...');
+    setLoading(true);
+
+    try {
+      // Use the API key passed from server-side
+      console.log('Making API request with key:', buttondownApiKey ? 'Key available' : 'No key');
+      
+      // Use the format required by Buttondown's API: include only supported fields
+      const requestBody = {
+        email_address: email,
+        tags: ['waitlist', 'peerpen'],
+        notes: 'Signup from PeerPen prelaunch site'
+      };
+      
+      console.log('Request body:', requestBody);
+      console.log('API Key length:', buttondownApiKey?.length);
+      console.log('API Key starts with:', buttondownApiKey?.substring(0, 8));
+      
+      const response = await fetch('https://api.buttondown.email/v1/subscribers', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Token ${buttondownApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody)
+      });
+      
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
+      if (response.ok) {
+        showMessage('Successfully joined the waitlist! Check your email for confirmation.', 'success');
+        emailInput.value = '';
+      } else {
+        const errorData = await response.json();
+        console.log('Error response:', errorData);
+        
+        if (response.status === 400 && errorData.error?.includes('already subscribed')) {
+          showMessage('You\'re already on the waitlist!', 'success');
+        } else if (response.status === 422) {
+          console.log('422 error details:', errorData);
+          showMessage(`Error: ${errorData.error || 'Invalid request format'}`, 'error');
+        } else {
+          showMessage('Something went wrong. Please try again.', 'error');
+        }
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      showMessage('Something went wrong. Please try again.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  });
+</script>

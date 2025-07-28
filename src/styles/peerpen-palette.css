@@ -1,0 +1,84 @@
+/* PeerPen Brand Color Palette */
+
+:root {
+  /* Primary Mint Colors */
+  --mint-50: #f0fffe;
+  --mint-100: #ccfffd;
+  --mint-200: #99fffb;
+  --mint-300: #66fff9;
+  --mint-400: #33fff7;
+  --mint-500: #C0FDFB; /* Primary mint */
+  --mint-600: #99fbf8;
+  --mint-700: #66f9f5;
+  --mint-800: #33f7f2;
+  --mint-900: #00f5ef;
+
+  /* Primary Sky Colors */
+  --sky-50: #f0fbff;
+  --sky-100: #ccf3ff;
+  --sky-200: #99e7ff;
+  --sky-300: #66dbff;
+  --sky-400: #33cfff;
+  --sky-500: #A3E7FC; /* Primary sky */
+  --sky-600: #80d9f9;
+  --sky-700: #5dcbf6;
+  --sky-800: #3abdf3;
+  --sky-900: #17aff0;
+
+  /* Neutral Colors */
+  --primary: #000000;
+  --secondary: #ffffff;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+
+  /* Gradients */
+  --gradient-mint-sky: linear-gradient(135deg, var(--mint-500) 0%, var(--sky-500) 100%);
+  --gradient-mint-sky-reverse: linear-gradient(135deg, var(--sky-500) 0%, var(--mint-500) 100%);
+  --gradient-mint-dark: linear-gradient(135deg, var(--mint-500) 0%, var(--mint-700) 100%);
+  --gradient-sky-dark: linear-gradient(135deg, var(--sky-500) 0%, var(--sky-700) 100%);
+}
+
+/* Utility Classes */
+.text-mint { color: var(--mint-500); }
+.text-sky { color: var(--sky-500); }
+.text-mint-light { color: var(--mint-100); }
+.text-sky-light { color: var(--sky-100); }
+.text-mint-dark { color: var(--mint-700); }
+.text-sky-dark { color: var(--sky-700); }
+
+.bg-mint { background-color: var(--mint-500); }
+.bg-sky { background-color: var(--sky-500); }
+.bg-mint-light { background-color: var(--mint-100); }
+.bg-sky-light { background-color: var(--sky-100); }
+.bg-mint-dark { background-color: var(--mint-700); }
+.bg-sky-dark { background-color: var(--sky-700); }
+
+.bg-gradient-mint-sky { background: var(--gradient-mint-sky); }
+.bg-gradient-sky-mint { background: var(--gradient-mint-sky-reverse); }
+.bg-gradient-mint-dark { background: var(--gradient-mint-dark); }
+.bg-gradient-sky-dark { background: var(--gradient-sky-dark); }
+
+.border-mint { border-color: var(--mint-500); }
+.border-sky { border-color: var(--sky-500); }
+.border-mint-light { border-color: var(--mint-200); }
+.border-sky-light { border-color: var(--sky-200); }
+
+/* Hover Effects */
+.hover-mint:hover { color: var(--mint-500); }
+.hover-sky:hover { color: var(--sky-500); }
+.hover-bg-mint:hover { background-color: var(--mint-500); }
+.hover-bg-sky:hover { background-color: var(--sky-500); }
+.hover-bg-mint-light:hover { background-color: var(--mint-100); }
+.hover-bg-sky-light:hover { background-color: var(--sky-100); }
+
+/* Focus States */
+.focus-mint:focus { border-color: var(--mint-500); box-shadow: 0 0 0 3px rgba(192, 253, 251, 0.1); }
+.focus-sky:focus { border-color: var(--sky-500); box-shadow: 0 0 0 3px rgba(163, 231, 252, 0.1); } 
