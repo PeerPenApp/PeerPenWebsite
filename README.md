@@ -1,160 +1,178 @@
-<p align="center">
-  <img src="assets/gh-banner.png" alt="Cannonbal Theme Banner">
-</p>
+# PeerPen - College Essay Writing & AI Analysis Platform
 
-<br/>
-<div align="center">
-  <a href="https://twitter.com/littlesticksdev">
-  <img src="assets/twitter-badge.svg" alt="Follow Little Sticks on Twitter"/>
-</a>
-  <a href="https://littlesticks.lemonsqueezy.com/checkout/buy/ce15f246-6ffb-417d-b380-0745aeef69a9">
-    <img src="assets/sponsor-badge.svg" alt="Sponsor This Repo" />
-  </a>
-  <a href="https://littlesticks.dev/discord">
-    <img src="assets/discord-badge.svg" alt="Join our Discord" />
-  </a>
-  
-</div>
-<br/>
-
-# PeerPen
-
-A web platform for writing, sharing, reviewing, and improving college essays with peer feedback and AI analysis.
+PeerPen is a comprehensive platform for writing, editing, and analyzing college essays with AI-powered feedback, social features, and advanced content moderation.
 
 ## Features
 
-- ✍️ Rich text editor for essay writing
-- 👥 Peer review system with rubric scoring
-- 🤖 AI-powered essay analysis
-- 📊 User profiles and karma system
-- 🚨 Content moderation tools
-- 📱 Instagram-style responsive design
+- **Essay Editor**: Create, edit, and manage your essays with version control
+- **AI Analysis**: Get detailed feedback on your writing using multiple AI models with rubric scoring
+- **Social Platform**: Comment, rate, and interact with other essays
+- **Advanced Search**: Full-text search across essays and users using SQLite FTS5
+- **Content Moderation**: Built-in reporting and moderation system
+- **User Management**: Profile verification, following system, and activity tracking
+- **User Authentication**: Secure login with Clerk
+- **Database Storage**: Persistent storage with Turso (SQLite)
+- **Modern UI**: Beautiful, responsive interface built with Next.js and Tailwind CSS
 
-## Tech Stack
+## Architecture
 
-- **Frontend**: Astro + React + TailwindCSS
-- **Backend**: Node.js with Astro SSR
-- **Database**: Turso (libSQL)
-- **AI**: OpenRouter with comprehensive backup model system including GPT-OSS-20B, GLM-4.5 Air, Kimi K2, Claude 3.5, and 15+ other models
-- **Analytics**: PostHog
-- **Monitoring**: Sentry
-- **Rate Limiting**: Upstash Redis
+### Database Schema
+The platform uses a comprehensive database schema designed for scalability and performance:
 
-## Quick Start
+#### Core Tables
+- **profiles**: User profiles with Clerk integration, verification, and social features
+- **essays**: Essay content with versioning, visibility controls, and soft deletes
+- **feedback**: AI and peer feedback with detailed rubric scoring
+- **comments**: Nested comment system with moderation
+- **ratings**: 1-5 star rating system for essays
+- **tags**: Essay categorization and discovery
+- **prompts**: Essay prompts and questions
 
-1. **Install dependencies**
-   ```bash
-   npm install
-   ```
+#### Advanced Features
+- **essay_versions**: Complete version history for essays with change tracking
+- **evaluation_scores**: Detailed rubric scoring across 6 dimensions
+- **follows**: User following system for social discovery
+- **bookmarks**: User bookmarking system for favorite content
+- **reports**: Content moderation system with admin review
+- **moderation_actions**: Complete audit trail for moderation decisions
 
-2. **Set up environment variables**
-   ```bash
-   # Database
-   TURSO_DATABASE_URL=your_turso_db_url
-   TURSO_AUTH_TOKEN=your_turso_auth_token
-   
-   # AI
-   OPENROUTER_API_KEY=your_openrouter_api_key
-   SITE_URL=your_site_url
-   
-   # Optional
-   UPSTASH_REDIS_REST_URL=your_redis_url
-   UPSTASH_REDIS_REST_TOKEN=your_redis_token
-   SENTRY_DSN=your_sentry_dsn
-   ```
+#### Search & Performance
+- **essay_fts**: Full-text search using SQLite FTS5 with automatic indexing
+- **Triggers**: Automatic synchronization of search index with content changes
+- **Views**: Pre-computed aggregations for ratings and rubric scores
+- **Indexes**: Optimized for common query patterns and performance
 
-3. **Initialize database**
-   ```bash
-   # First time setup - creates all tables
-   curl -X POST http://localhost:4321/api/init-db
-   ```
+### Rubric Scoring System
+AI analysis provides detailed scoring across multiple dimensions:
+- **Flow** (0-10): Logical progression and coherence
+- **Hook** (0-10): Engaging opening and narrative pull  
+- **Voice** (0-10): Authentic personal expression
+- **Uniqueness** (0-10): Original perspective and insights
+- **Conciseness** (0-10): Efficient use of words
+- **Authenticity** (0-10): Genuine personal voice
 
-4. **Start development server**
-   ```bash
-   npm run dev
-   ```
+## Setup Instructions
 
-5. **Build for production**
-   ```bash
-   npm run build
-   npm run preview
-   ```
+### 1. Environment Variables
 
-## Database Setup
+Create a `.env.local` file in your project root with the following variables:
 
-The app uses Turso (libSQL) for the database. On first run, you must initialize the database schema by calling the `/api/init-db` endpoint. This creates all necessary tables:
+```bash
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key_here
+CLERK_SECRET_KEY=your_clerk_secret_key_here
 
-- `users` - User accounts and profiles
-- `essays` - Essay metadata
-- `essay_versions` - Essay content versions
-- `reviews` - Peer reviews
-- `review_scores` - Rubric scores
-- `comments` - Comments on essays/reviews
-- `votes` - Upvotes/downvotes
-- `notifications` - User notifications
-- `reports` - Content moderation reports
+# Turso Database
+TURSO_DATABASE_URL=your_turso_database_url_here
+TURSO_AUTH_TOKEN=your_turso_auth_token_here
+
+# OpenRouter API (for AI analysis)
+OPENROUTER_API_KEY=your_openrouter_api_key_here
+
+# Site URL (optional, defaults to localhost:3000)
+SITE_URL=http://localhost:3000
+```
+
+### 2. Install Dependencies
+
+```bash
+pnpm install
+```
+
+### 3. Database Setup
+
+The database schema is automatically created when you first use the app. The schema includes:
+
+- **User Management**: Profiles, verification, following system
+- **Content Management**: Essays, versions, comments, ratings
+- **AI Integration**: Feedback, rubric scoring, analysis tracking
+- **Moderation**: Reporting, admin actions, audit trails
+- **Search**: Full-text search with automatic indexing
+- **Performance**: Optimized views, indexes, and triggers
+
+### 4. Run the Development Server
+
+```bash
+pnpm dev
+```
 
 ## API Endpoints
 
-- `POST /api/auth/signup` - User registration
-- `GET /api/essays` - List essays
-- `POST /api/essays` - Create essay
-- `POST /api/reviews` - Submit review
-- `POST /api/ai/analyze` - AI essay analysis
-- `GET /api/notifications` - User notifications
-- `GET /api/moderation/reports` - Moderation reports
+### Essays
+- `POST /api/essays` - Create new essay
+- `GET /api/essays` - List essays with filtering and pagination
+- `PUT /api/essays/[id]` - Update essay
+- `DELETE /api/essays/[id]` - Soft delete essay
 
-## AI Analysis System
+### Analysis & Feedback
+- `POST /api/essays/[id]/analyze` - AI-powered essay analysis with rubric scoring
 
-The platform uses OpenRouter to access multiple AI models for essay analysis, with automatic fallback to ensure reliability:
+### Social Features
+- `POST /api/essays/[id]/comments` - Add comment to essay
+- `GET /api/essays/[id]/comments` - Get comments for essay
+- `POST /api/essays/[id]/like` - Rate essay (1-5 stars)
 
-### Primary Models (High Quality)
-- **OpenAI**: GPT-OSS-20B
-- **Z.AI**: GLM-4.5 Air  
-- **MoonshotAI**: Kimi K2
-- **TNG**: DeepSeek R1T2 Chimera
-- **Mistral**: Mistral Small 3.2 24B
+### Search & Discovery
+- `GET /api/search` - Full-text search across essays and users
+- Supports filtering by status, visibility, and rating
 
-### Flexible Models (Instruction-Tuned)
-- **Venice**: Uncensored (Mistral 24B Venice Edition)
-- **Tencent**: Hunyuan A13B Instruct
-- **Qwen**: Qwen3 Coder
-- **Anthropic**: Claude 3.5 Sonnet & Haiku
+### Admin & Moderation
+- `GET /api/admin/users` - List users with moderation tools
+- `PATCH /api/admin/users` - Moderate users (verify, ban, etc.)
+- `GET /api/admin/reports` - List content reports
+- `PATCH /api/admin/reports` - Handle reports (approve, reject, review)
 
-### Long-Context Models (Essay-Friendly)
-- **Google**: Gemma 3N 2B & Gemini 1.5 Flash
-- **DeepSeek**: V3
-- **Mistral**: Mixtral 8x22B
-- **MoonshotAI**: Kimi K1.5
+## Key Features
 
-### Fallback System
-If all AI models fail, the system provides enhanced basic analysis including:
-- Word count, character count, sentence/paragraph analysis
-- Readability metrics and writing tips
-- Manual review checklist
-- Troubleshooting guidance for API issues
+### Content Management
+- **Version Control**: Track all changes to essays with change notes
+- **Visibility Controls**: Public, followers-only, or private essays
+- **Soft Deletes**: Content is marked as deleted rather than permanently removed
+- **Moderation**: Built-in reporting and admin review system
 
-The system automatically tries models in priority order and gracefully degrades to ensure users always receive helpful feedback.
+### AI Analysis
+- **Multiple Models**: Fallback system with multiple AI providers
+- **Rubric Scoring**: Detailed feedback across 6 dimensions
+- **Analysis History**: Track all AI feedback and improvements
+- **Model Auditing**: Record which AI model provided each analysis
 
-## Development
+### Social Platform
+- **Comments**: Nested comment system with moderation
+- **Ratings**: 1-5 star rating system for essays
+- **Following**: User following system for content discovery
+- **Bookmarks**: Save favorite essays for later reading
 
-- **Port**: 4321 (or next available)
-- **Database**: Local SQLite file (`./dev.db`) in development
-- **Hot reload**: Enabled for all file changes
-- **TypeScript**: Full type safety with Astro
+### Search & Discovery
+- **Full-Text Search**: Search across essay titles and content
+- **User Search**: Find users by username, display name, or bio
+- **Filtering**: Filter by status, visibility, rating, and more
+- **Ranking**: Relevance-based search results
 
-## Deployment
+### Moderation & Safety
+- **Content Reporting**: Users can report inappropriate content
+- **Admin Review**: Comprehensive admin tools for content moderation
+- **Audit Trails**: Complete history of all moderation actions
+- **Automatic Actions**: Content removal for approved reports
 
-The app is configured for Vercel deployment with the Node.js adapter. The build output is in `dist/` and includes both client and server bundles.
+## Development Notes
+
+- **Database**: Turso (SQLite) with FTS5 for search and comprehensive schema
+- **Authentication**: Clerk integration for secure user management
+- **AI Analysis**: OpenRouter API integration with multiple AI models
+- **Search**: Full-text search with automatic indexing and synchronization
+- **Moderation**: Built-in content moderation with admin tools
+- **Performance**: Optimized queries, views, and indexing for scale
+- **Security**: Foreign key constraints, soft deletes, and audit trails
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+This is a comprehensive platform designed for production use. The database schema supports:
+- Large-scale user management
+- Advanced content moderation
+- Comprehensive audit trails
+- High-performance search
+- Scalable social features
 
 ## License
 
-MIT License - see LICENSE file for details.
+This project is licensed under the MIT License.
