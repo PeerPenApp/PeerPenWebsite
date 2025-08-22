@@ -1,0 +1,134 @@
+// Prisma schema for PeerPen MVP
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  handle        String   @unique
+  email         String?  @unique
+  displayName   String?
+  bio           String?
+  karma         Int      @default(0)
+  essays        Essay[]
+  reviews       Review[]
+  comments      Comment[]
+  votes         Vote[]
+  sessions      Session[]
+  notifications Notification[]
+  reportsFiled  Report[] @relation("ReportsByUser")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Essay {
+  id           String         @id @default(cuid())
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  authorId     String
+  author       User           @relation(fields: [authorId], references: [id])
+  title        String
+  isPublic     Boolean        @default(false)
+  versions     EssayVersion[]
+  reviews      Review[]
+  comments     Comment[]
+}
+
+model EssayVersion {
+  id        String   @id @default(cuid())
+  essayId   String
+  essay     Essay    @relation(fields: [essayId], references: [id])
+  createdAt DateTime @default(now())
+  content   String
+  notes     String?
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  essayId   String
+  essay     Essay    @relation(fields: [essayId], references: [id])
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  summary   String
+  scores    ReviewScore?
+  comments  Comment[]
+  votes     Vote[]
+}
+
+model ReviewScore {
+  id            String @id @default(cuid())
+  reviewId      String @unique
+  review        Review @relation(fields: [reviewId], references: [id])
+  flow          Int
+  hook          Int
+  voice         Int
+  uniqueness    Int
+  conciseness   Int
+  authenticity  Int
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  essayId   String?
+  essay     Essay?   @relation(fields: [essayId], references: [id])
+  reviewId  String?
+  review    Review?  @relation(fields: [reviewId], references: [id])
+  content   String
+  startPos  Int?
+  endPos    Int?
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  reviewId  String
+  review    Review   @relation(fields: [reviewId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  value     Int      @default(1)
+
+  @@unique([reviewId, userId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String
+  data      String
+  read      Boolean  @default(false)
+}
+
+model Report {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  reporterId String
+  reporter   User     @relation("ReportsByUser", fields: [reporterId], references: [id])
+  targetType String   // 'essay' | 'review' | 'comment'
+  targetId   String
+  reason     String
+  status     String   @default("open")
+}
+
+

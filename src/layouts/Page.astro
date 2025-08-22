@@ -4,6 +4,8 @@ import type { Props as BaseHeadProps } from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import FadeIn from '../components/FadeIn.astro';
+// Temporarily disabled analytics
+// import Analytics from '../components/Analytics.astro';
 
 export interface Props {
 	seo?: BaseHeadProps;
@@ -16,6 +18,8 @@ const { seo } = Astro.props as Props;
   <Fragment slot="head-bottom">
     <!-- This is the global fade-in animation being used -->
     <FadeIn/>
+    <!-- Temporarily disabled analytics -->
+    <!-- <Analytics /> -->
   </Fragment>
   <Header slot="header" />
 		<slot />

@@ -1,0 +1,1 @@
+import{o as i}from"./clerk.CdpVcd5_.js";import"./hoisted.D5DtYyPO.js";const t=new i("pk_test_bG9naWNhbC13YXJ0aG9nLTI0LmNsZXJrLmFjY291bnRzLmRldiQ");await t.load();const n=document.getElementById("sign-up");n&&t.mountSignUp(n,{routing:"path",path:"/signup",signInUrl:"/",afterSignUpUrl:"/app"});

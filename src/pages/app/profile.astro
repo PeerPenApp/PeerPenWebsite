@@ -1,0 +1,58 @@
+---
+import Layout from '../../layouts/Page.astro'
+import UserProfile from '../../react/NotificationsCenter'
+import { SignedIn, SignedOut } from '@clerk/astro/components';
+---
+
+<Layout>
+  <SignedIn>
+    <!-- Navigation -->
+    <nav class="nav">
+      <div class="nav-container">
+        <a href="/app" class="nav-brand">PeerPen</a>
+        <div class="nav-menu">
+          <a href="/app" class="nav-link">Home</a>
+          <a href="/app/write" class="nav-link">Write</a>
+          <a href="/app/feed" class="nav-link">Feed</a>
+          <a href="/app/profile" class="nav-link">Profile</a>
+          <a href="/app/moderation" class="nav-link">Moderation</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+      <div class="card">
+        <div class="card-header">
+          <h1 class="card-title">My Profile</h1>
+          <p class="text-sm text-gray-600">Manage your essays and view your activity</p>
+        </div>
+        
+        <div class="p-6">
+          <UserProfile client:only="react" />
+        </div>
+      </div>
+    </main>
+
+    <!-- Floating Action Button for Quick Essay Creation -->
+    <button class="fab" onclick="window.location.href='/app/write'" title="Create New Essay">
+      ✍️
+    </button>
+  </SignedIn>
+
+  <SignedOut>
+    <div class="container text-center py-20">
+      <div class="mb-8">
+        <span class="text-8xl">🔒</span>
+      </div>
+      <h1 class="text-3xl font-bold mb-4">Authentication Required</h1>
+      <p class="text-gray-600 mb-8">Please sign in to view your profile.</p>
+      <div class="flex gap-4 justify-center">
+        <a href="/" class="btn btn-primary">Sign In</a>
+        <a href="/signup" class="btn btn-secondary">Sign Up</a>
+      </div>
+    </div>
+  </SignedOut>
+</Layout>
+
+

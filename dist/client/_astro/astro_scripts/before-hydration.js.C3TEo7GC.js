@@ -1,0 +1,1 @@
+import{r as n}from"../index.C0BsohvG.js";import"../chunk-K6S4O6NY.6jAmY9Ez.js";await n({signInUrl:"/login",signUpUrl:"/signup",afterSignInUrl:"/app",afterSignUpUrl:"/app",sdkMetadata:{version:"2.11.4",name:"@clerk/astro",environment:"production"}});

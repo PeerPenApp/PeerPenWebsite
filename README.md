@@ -17,55 +17,144 @@
 </div>
 <br/>
 
-# Cannonball Splash Page 💦
+# PeerPen
 
-This is a template for a modern splash page/coming soon page inspired by [this Framer template](https://coming-soon.framer.website/).
-
-You can learn more about this template/theme's creation in [this YouTube video](https://www.youtube.com/watch?v=o58kSpPMuuI)
+A web platform for writing, sharing, reviewing, and improving college essays with peer feedback and AI analysis.
 
 ## Features
 
-- ✅ Modern Design
-- ✅ Email Signup Form
-- ✅ SEO friendly
-- ✅ Modern CSS Reset via Andy Bell
-- ✅ Fluid typography scaling via Utopia
-- ✅ Base and Page Layouts
-- ✅ A generic but flexible Button component
-- ✅ Automatic Sitemap
+- ✍️ Rich text editor for essay writing
+- 👥 Peer review system with rubric scoring
+- 🤖 AI-powered essay analysis
+- 📊 User profiles and karma system
+- 🚨 Content moderation tools
+- 📱 Instagram-style responsive design
 
-## Get Started 
+## Tech Stack
 
-Customize the global site settings such as the title and description in the `src/data/settings.ts` file
+- **Frontend**: Astro + React + TailwindCSS
+- **Backend**: Node.js with Astro SSR
+- **Database**: Turso (libSQL)
+- **AI**: OpenRouter with comprehensive backup model system including GPT-OSS-20B, GLM-4.5 Air, Kimi K2, Claude 3.5, and 15+ other models
+- **Analytics**: PostHog
+- **Monitoring**: Sentry
+- **Rate Limiting**: Upstash Redis
 
-Set your own social profile links and icons in the `src/data/socials.ts` file
+## Quick Start
 
-<p>
-  <a href="https://stackblitz.com/github/littlesticks/cannonball">
-  <img src="https://developer.stackblitz.com/img/open_in_stackblitz.svg" height="36px" />
-  </a>
-</p>
+1. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-OR
+2. **Set up environment variables**
+   ```bash
+   # Database
+   TURSO_DATABASE_URL=your_turso_db_url
+   TURSO_AUTH_TOKEN=your_turso_auth_token
+   
+   # AI
+   OPENROUTER_API_KEY=your_openrouter_api_key
+   SITE_URL=your_site_url
+   
+   # Optional
+   UPSTASH_REDIS_REST_URL=your_redis_url
+   UPSTASH_REDIS_REST_TOKEN=your_redis_token
+   SENTRY_DSN=your_sentry_dsn
+   ```
 
-## Local Development
+3. **Initialize database**
+   ```bash
+   # First time setup - creates all tables
+   curl -X POST http://localhost:4321/api/init-db
+   ```
 
-```sh
-npm i && npm start
-```
+4. **Start development server**
+   ```bash
+   npm run dev
+   ```
 
-## Deploy
+5. **Build for production**
+   ```bash
+   npm run build
+   npm run preview
+   ```
 
-Astro has [an in-depth guide](https://docs.astro.build/en/guides/deploy/) on how to deploy an Astro project to each service.
+## Database Setup
 
-## Sponsor
+The app uses Turso (libSQL) for the database. On first run, you must initialize the database schema by calling the `/api/init-db` endpoint. This creates all necessary tables:
 
-If you find this theme useful, please consider donating to support the continued development of it with the link below
+- `users` - User accounts and profiles
+- `essays` - Essay metadata
+- `essay_versions` - Essay content versions
+- `reviews` - Peer reviews
+- `review_scores` - Rubric scores
+- `comments` - Comments on essays/reviews
+- `votes` - Upvotes/downvotes
+- `notifications` - User notifications
+- `reports` - Content moderation reports
 
-[Donate to Little Sticks](https://littlesticks.lemonsqueezy.com/checkout/buy/ce15f246-6ffb-417d-b380-0745aeef69a9)
+## API Endpoints
 
-## Support
+- `POST /api/auth/signup` - User registration
+- `GET /api/essays` - List essays
+- `POST /api/essays` - Create essay
+- `POST /api/reviews` - Submit review
+- `POST /api/ai/analyze` - AI essay analysis
+- `GET /api/notifications` - User notifications
+- `GET /api/moderation/reports` - Moderation reports
 
-Please feel free to reach out to us on our Discord if you have questions or file an issue on the repo.
+## AI Analysis System
 
-[Join our Discord](https://littlesticks.dev/discord)
+The platform uses OpenRouter to access multiple AI models for essay analysis, with automatic fallback to ensure reliability:
+
+### Primary Models (High Quality)
+- **OpenAI**: GPT-OSS-20B
+- **Z.AI**: GLM-4.5 Air  
+- **MoonshotAI**: Kimi K2
+- **TNG**: DeepSeek R1T2 Chimera
+- **Mistral**: Mistral Small 3.2 24B
+
+### Flexible Models (Instruction-Tuned)
+- **Venice**: Uncensored (Mistral 24B Venice Edition)
+- **Tencent**: Hunyuan A13B Instruct
+- **Qwen**: Qwen3 Coder
+- **Anthropic**: Claude 3.5 Sonnet & Haiku
+
+### Long-Context Models (Essay-Friendly)
+- **Google**: Gemma 3N 2B & Gemini 1.5 Flash
+- **DeepSeek**: V3
+- **Mistral**: Mixtral 8x22B
+- **MoonshotAI**: Kimi K1.5
+
+### Fallback System
+If all AI models fail, the system provides enhanced basic analysis including:
+- Word count, character count, sentence/paragraph analysis
+- Readability metrics and writing tips
+- Manual review checklist
+- Troubleshooting guidance for API issues
+
+The system automatically tries models in priority order and gracefully degrades to ensure users always receive helpful feedback.
+
+## Development
+
+- **Port**: 4321 (or next available)
+- **Database**: Local SQLite file (`./dev.db`) in development
+- **Hot reload**: Enabled for all file changes
+- **TypeScript**: Full type safety with Astro
+
+## Deployment
+
+The app is configured for Vercel deployment with the Node.js adapter. The build output is in `dist/` and includes both client and server bundles.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+MIT License - see LICENSE file for details.
