@@ -3,7 +3,8 @@
 export const dynamic = 'force-dynamic'
 
 import { useState, useEffect } from "react"
-import { Search, Filter, BookOpen, Star, Loader2, Heart, MessageCircle, Eye, Brain, X } from "lucide-react"
+import { Search, Filter, BookOpen, Loader2, Heart, MessageCircle, Eye, Brain, X } from "lucide-react"
+import { StarRating, StarRatingDisplay } from "@/components/ui/star-rating"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -233,30 +234,44 @@ export default function EssaysPage() {
     setEssayLikeStatus({ ratingCount: 0, userRating: null, avgRating: 0 })
   }
 
-  const toggleEssayLike = async () => {
+  const handleEssayRatingChange = async (newRating: number) => {
     if (!essayModal.essay) return
     
     try {
-      const currentRating = essayLikeStatus.userRating
-      const newRating = currentRating === 1 ? null : 1
-      
       const response = await fetch(`/api/essays/${essayModal.essay.id}/like`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ score: newRating ? 1 : 0 })
+        body: JSON.stringify({ score: newRating })
       })
 
       if (response.ok) {
         const data = await response.json()
+        
+        // Update local state
         setEssayLikeStatus(prev => ({ 
-          ratingCount: data.rated ? prev.ratingCount + 1 : prev.ratingCount - 1, 
-          userRating: data.rated ? 1 : null, 
+          ratingCount: data.rated ? prev.ratingCount : prev.ratingCount - 1, 
+          userRating: data.rated ? newRating : null, 
           avgRating: prev.avgRating 
         }))
+        
+        // Refresh the rating data to get updated averages
+        const likeResponse = await fetch(`/api/essays/${essayModal.essay.id}/like`)
+        if (likeResponse.ok) {
+          const likeData = await likeResponse.json()
+          setEssayLikeStatus(prev => ({
+            ...prev,
+            ratingCount: likeData.ratingCount || 0,
+            avgRating: likeData.avgRating || 0
+          }))
+        }
+        
         toast.success(data.message)
+      } else {
+        const errorData = await response.json()
+        toast.error(errorData.error || 'Failed to update rating')
       }
     } catch (error) {
-      console.error('Error toggling like:', error)
+      console.error('Error updating rating:', error)
       toast.error('Failed to update rating')
     }
   }
@@ -508,8 +523,11 @@ export default function EssaysPage() {
                           </div>
                         </div>
                         <div className="flex items-center gap-1 text-sm">
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span className="font-medium">{essay.avgRating.toFixed(1)}</span>
+                          <StarRatingDisplay
+                            rating={essay.avgRating}
+                            size="sm"
+                            showScore={true}
+                          />
                           <span className="text-muted-foreground">({essay.ratingCount})</span>
                         </div>
                       </div>
@@ -659,18 +677,28 @@ export default function EssaysPage() {
 
               {/* Interaction Section */}
               <div className="border-t pt-6">
-                <div className="flex items-center gap-4 mb-4">
-                  <Button
-                    onClick={toggleEssayLike}
-                    variant={essayLikeStatus.userRating === 1 ? "default" : "outline"}
-                    className={essayLikeStatus.userRating === 1 ? "bg-red-500 hover:bg-red-600" : ""}
-                  >
-                    <Heart className={`w-4 h-4 mr-2 ${essayLikeStatus.userRating === 1 ? "fill-current" : ""}`} />
-                    {essayLikeStatus.userRating === 1 ? "Liked" : "Like"}
-                  </Button>
-                  <span className="text-sm text-muted-foreground">
-                    {essayLikeStatus.ratingCount} {essayLikeStatus.ratingCount === 1 ? 'person' : 'people'} liked this essay
-                  </span>
+                <div className="space-y-4 mb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">Rate this essay:</span>
+                      <StarRating
+                        rating={essayLikeStatus.userRating || 0}
+                        onRatingChange={handleEssayRatingChange}
+                        size="md"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">Average:</span>
+                      <StarRatingDisplay
+                        rating={essayLikeStatus.avgRating}
+                        size="sm"
+                        showScore={true}
+                      />
+                      <span className="text-sm text-muted-foreground">
+                        ({essayLikeStatus.ratingCount} {essayLikeStatus.ratingCount === 1 ? 'rating' : 'ratings'})
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Comments Section */}

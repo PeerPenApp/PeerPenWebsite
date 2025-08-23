@@ -22,6 +22,15 @@ export const metadata: Metadata = {
   title: "PeerPen - Social Essay Platform",
   description: "Share, review, and improve college essays with AI and peer feedback",
   generator: "v0.app",
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: 'any' }
+    ],
+    apple: '/apple-touch-icon.png',
+  },
+  manifest: '/site.webmanifest',
+  themeColor: '#171717',
 }
 
 export default function RootLayout({

@@ -44,8 +44,9 @@ export async function POST(
     const body = await request.json();
     const { score } = body;
 
-    if (!score || score < 1 || score > 5) {
-      return NextResponse.json({ error: 'Score must be between 1 and 5' }, { status: 400 });
+    // Allow score to be 0 (remove rating) or between 1-5
+    if (score !== 0 && (score < 1 || score > 5)) {
+      return NextResponse.json({ error: 'Score must be 0 (remove rating) or between 1 and 5' }, { status: 400 });
     }
 
     // Check if user already rated this essay
@@ -55,32 +56,56 @@ export async function POST(
     });
 
     if (existingRating.rows.length > 0) {
-      // Update existing rating
-      await db.execute({
-        sql: `UPDATE ratings SET score = ? WHERE essay_id = ? AND rater_id = ?`,
-        args: [score, id, userId]
-      });
+      if (score === 0) {
+        // Remove existing rating
+        await db.execute({
+          sql: `DELETE FROM ratings WHERE essay_id = ? AND rater_id = ?`,
+          args: [id, userId]
+        });
 
-      return NextResponse.json({ 
-        success: true, 
-        rated: true,
-        score: score,
-        message: 'Rating updated successfully'
-      });
+        return NextResponse.json({ 
+          success: true, 
+          rated: false,
+          score: 0,
+          message: 'Rating removed successfully'
+        });
+      } else {
+        // Update existing rating
+        await db.execute({
+          sql: `UPDATE ratings SET score = ? WHERE essay_id = ? AND rater_id = ?`,
+          args: [score, id, userId]
+        });
+
+        return NextResponse.json({ 
+          success: true, 
+          rated: true,
+          score: score,
+          message: 'Rating updated successfully'
+        });
+      }
     } else {
-      // Create new rating
-      const ratingId = nanoid();
-      await db.execute({
-        sql: `INSERT INTO ratings (id, essay_id, rater_id, score) VALUES (?, ?, ?, ?)`,
-        args: [ratingId, id, userId, score]
-      });
+      if (score === 0) {
+        return NextResponse.json({ 
+          success: true, 
+          rated: false,
+          score: 0,
+          message: 'No rating to remove'
+        });
+      } else {
+        // Create new rating
+        const ratingId = nanoid();
+        await db.execute({
+          sql: `INSERT INTO ratings (id, essay_id, rater_id, score) VALUES (?, ?, ?, ?)`,
+          args: [ratingId, id, userId, score]
+        });
 
-      return NextResponse.json({ 
-        success: true, 
-        rated: true,
-        score: score,
-        message: 'Essay rated successfully'
-      });
+        return NextResponse.json({ 
+          success: true, 
+          rated: true,
+          score: score,
+          message: 'Essay rated successfully'
+        });
+      }
     }
   } catch (error) {
     console.error('Error rating essay:', error);

@@ -3,7 +3,8 @@
 export const dynamic = 'force-dynamic'
 
 import { useState, useEffect } from "react"
-import { User, Edit, Save, X, Camera, BookOpen, Star, Users, Calendar } from "lucide-react"
+import { User, Edit, Save, X, Camera, BookOpen, Users, Calendar } from "lucide-react"
+import { StarRatingDisplay } from "@/components/ui/star-rating"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -328,7 +329,11 @@ export default function ProfilePage() {
                 <Card>
                   <CardContent className="p-4">
                     <div className="flex items-center space-x-2">
-                      <Star className="h-4 w-4 text-muted-foreground" />
+                                                  <StarRatingDisplay
+                              rating={0}
+                              size="sm"
+                              showScore={false}
+                            />
                       <div>
                         <p className="text-2xl font-bold">{stats.avgRating.toFixed(1)}</p>
                         <p className="text-xs text-muted-foreground">Avg Rating</p>

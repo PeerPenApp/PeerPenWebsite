@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Switch } from '@/components/ui/switch'
 import { Progress } from '@/components/ui/progress'
+import { StarRating, StarRatingDisplay } from '@/components/ui/star-rating'
 import { useUser } from '@clerk/nextjs'
 import { 
   Save, 
@@ -375,28 +376,34 @@ export default function EssayEditor() {
     }
   }
 
-  const toggleLike = async (essayId: string) => {
+  const handleRatingChange = async (essayId: string, newRating: number) => {
     try {
-      const currentRating = likeStatus.userRating
-      const newRating = currentRating === 1 ? null : 1
-      
       const response = await fetch(`/api/essays/${essayId}/like`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ score: newRating ? 1 : 0 })
+        body: JSON.stringify({ score: newRating })
       })
 
       if (response.ok) {
         const data = await response.json()
+        
+        // Update local state
         setLikeStatus(prev => ({ 
-          ratingCount: data.rated ? prev.ratingCount + 1 : prev.ratingCount - 1, 
-          userRating: data.rated ? 1 : null, 
+          ratingCount: data.rated ? prev.ratingCount : prev.ratingCount - 1, 
+          userRating: data.rated ? newRating : null, 
           avgRating: prev.avgRating 
         }))
+        
+        // Refresh the rating data to get updated averages
+        await fetchLikeStatus(essayId)
+        
         toast.success(data.message)
+      } else {
+        const errorData = await response.json()
+        toast.error(errorData.error || 'Failed to update rating')
       }
     } catch (error) {
-      console.error('Error toggling like:', error)
+      console.error('Error updating rating:', error)
       toast.error('Failed to update rating')
     }
   }
@@ -860,18 +867,28 @@ export default function EssayEditor() {
                     <>
                       <TabsContent value="interactions" className="mt-4">
                         <div className="space-y-4">
-                          <div className="flex items-center gap-4">
-                            <Button
-                              onClick={() => toggleLike(currentEssay.id)}
-                              variant={likeStatus.userRating === 1 ? "default" : "outline"}
-                              className={likeStatus.userRating === 1 ? "bg-red-500 hover:bg-red-600" : ""}
-                            >
-                              <Heart className={`w-4 h-4 mr-2 ${likeStatus.userRating === 1 ? "fill-current" : ""}`} />
-                              {likeStatus.userRating === 1 ? "Liked" : "Like"}
-                            </Button>
-                            <span className="text-sm text-muted-foreground">
-                              {likeStatus.ratingCount} {likeStatus.ratingCount === 1 ? 'person' : 'people'} liked this essay
-                            </span>
+                          <div className="space-y-4">
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium">Rate this essay:</span>
+                                <StarRating
+                                  rating={likeStatus.userRating || 0}
+                                  onRatingChange={(rating) => handleRatingChange(currentEssay.id, rating)}
+                                  size="md"
+                                />
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm text-muted-foreground">Average:</span>
+                                <StarRatingDisplay
+                                  rating={likeStatus.avgRating}
+                                  size="sm"
+                                  showScore={true}
+                                />
+                                <span className="text-sm text-muted-foreground">
+                                  ({likeStatus.ratingCount} {likeStatus.ratingCount === 1 ? 'rating' : 'ratings'})
+                                </span>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </TabsContent>

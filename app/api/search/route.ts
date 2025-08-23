@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
         essaysSql = `
           SELECT 
             e.id, e.title, e.content, e.word_count, e.college, e.prompt, e.visibility, e.status, e.created_at, e.updated_at,
-            p.display_name, p.username,
+            p.id as author_id, p.display_name, p.username,
             COUNT(DISTINCT r.id) as rating_count,
             AVG(r.score) as avg_rating,
             COUNT(DISTINCT c.id) as comment_count
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
         essaysSql = `
           SELECT 
             e.id, e.title, e.content, e.word_count, e.college, e.prompt, e.visibility, e.status, e.created_at, e.updated_at,
-            p.display_name, p.username,
+            p.id as author_id, p.display_name, p.username,
             COUNT(DISTINCT r.id) as rating_count,
             AVG(r.score) as avg_rating,
             COUNT(DISTINCT c.id) as comment_count
@@ -133,6 +133,7 @@ export async function GET(request: NextRequest) {
         visibility: row.visibility,
         status: row.status,
         author: row.display_name || row.username || 'Anonymous',
+        authorId: row.author_id,
         ratingCount: Number(row.rating_count),
         avgRating: row.avg_rating ? Number(row.avg_rating) : 0,
         commentCount: Number(row.comment_count),
